@@ -1,0 +1,29 @@
+require_relative "Plateau"
+
+if ARGV.length == 0
+  puts "Usage: ruby explore.rb \"filename.dat\""
+  exit
+end
+
+fname = ARGV[0]
+if fname == nil || fname == ""
+  puts "Invalid filename"
+  exit
+end
+  
+file = File.new(fname, "r")  
+size = file.gets
+size = size.split(" ")
+w, h = size[0], size[1]
+print w, h
+plateau = Plateau.new(w, h)
+while (line = file.gets)
+  start = file.gets.chomp
+  start = start.split(" ")
+  x, y, d = start[0], start[1], start[2]
+  plateau.start(x, y, d)
+  path = file.gets.chomp
+  path = path.chars.each { |x| x.upsize }
+  puts path
+end
+file.close

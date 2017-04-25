@@ -1,0 +1,4 @@
+require_relative "Plateau"
+
+plateau = Plateau.new()
+plateau.scan()

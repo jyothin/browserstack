@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script>
+      var socket = io.connect('http://localhost:8080');
+      socket.on('message', function (data) {
+        //console.log(data.lines);
+        // Update the tag
+        var tail = document.getElementById('tail');
+        tail.innerHTML = data.lines;
+      });
+    </script>
+  </head>
+  <body>
+    <div>
+      <p>Browserstack--</p>
+    </div>
+    <div>
+      <p>Here are the logs (tail -f):</p>
+    </div>
+    <div>
+      <p id="tail"></p>
+    </div>
+</html>

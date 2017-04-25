@@ -1,0 +1,97 @@
+Approach 1:
+- Fire up the browser from the command line on a terminal on a VNCServer
+- Feed the url to the browser
+- Wait for page to load
+- Use imagemagick, gimp, fbgrab or xv to capture image
+- Save image
+- Mark all HTML elements within the viewport as visible
+- Change viewport to start at end of visible section (essentially simulating
+scrolling)
+- Capture image
+- Concatenate previous image with new image
+- Repeat
+
+  Pros:
+  - Screen capture is easy using a 3rd party application
+  Cons:
+  - May not be possible on all OSes
+  - Dependency on external image capture application
+
+Approach 2:
+- Simulate the screen/framebuffer memory using xvfb (or other similar options
+  like DirectFB, etc.)
+- For non unix based systems run the OS as a virtual OS on a unix host
+- Render browser on the simulated framebuffer
+- Save framebuffer as image
+- Change viewport and repeat until all of viewport is covered
+
+  Pros:
+  - Requires a fixed sized memory to render the viewport
+  - Gives finer control over the content that is being rendered onto the 
+    framebuffer
+  Cons:
+  - Stitching individual images may not be accurate
+
+Approach 3:
+- Simulate the screen/framebuffer memory using xvfb (or other similar ooption
+  like DirectFB, etc.) to accomodate the full page
+- Render browser onto the simulated framebuffer
+- Save framebuffer as image
+
+  Pros:
+  - All of the page may not fit into the simulated framebuffer memory
+  - Full page screen capture in one step
+  Cons:
+  - Requires 'unknown' initial framebuffer size
+
+Approach 4:
+- Modify browser engine to render into user memory
+
+  Pros:
+  - More accurate rendering will be possible as rendering is happening by the
+  browser engine directly
+  Cons:
+  - Will need access to the browser engine's source code
+  - May not be possible to do for all browsers
+  - Will need to understand individual browser source code
+  
+Approach 5:
+- Render each element of the HTML page as a separate image
+- Composite the page using individual images based on each elements
+(x,y) position
+- Save page
+
+  Pros:
+  - Will have access to each individual element as an image
+  - Each element can be viewed as how it is being rendered
+  - Will be able to handle embedded elements
+  Cons:
+  - Compositing a single page using multiple images may be non-trivial
+  - There may be too many individual elements to composite
+
+Approach 6:
+- Define custom render tags and encapsulate HTML page into custom tags
+- Develop a render engine as an extension to browser that processess custom tags
+- Use render engine to render HTML page as image
+
+  Pros:
+  - Finer grained control over how pages are rendered
+  Cons:
+  - Develop a custom render engine for each browser
+  - Longer development cycles
+
+Recommendation:
+Approach 3
+
+Reasons:
+  - Provides a way to get full page screeshots without any additional 
+    composition
+  - Since framebuffer is simulated at the OS level you will the get the actual
+    page rendered as seen by a user i.e. What You See Is What You Get 
+    screenshots
+  - For OS that don't support framebuffer access use a virtual machine and
+    provide a user memory as the framebuffer from the host OS
+  - Will be faster as there is no compositing and a single buffer to image
+    conversion
+  - Will be easy to scale across OSes and browsers
+

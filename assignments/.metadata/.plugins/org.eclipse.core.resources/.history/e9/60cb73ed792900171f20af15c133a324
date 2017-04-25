@@ -1,0 +1,18 @@
+require_relative "Plateau"
+
+if ARGV.length == 0
+  puts "Usage: ruby explore.rb \"filename.dat\""
+  exit
+end
+
+fname = ARGV[0]
+File.read(fname) if fname != nil || fname != "" 
+
+size = gets.chomp
+size = size.split(" ")
+x, y = size[0], size[1]
+
+plateau = Plateau.new(x, y)
+
+
+plateau.scan()

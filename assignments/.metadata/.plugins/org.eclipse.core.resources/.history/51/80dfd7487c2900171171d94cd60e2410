@@ -1,0 +1,11 @@
+class Plateau
+  def initialize(w, h)
+    @w = w
+    @h = h
+    @rovers = Array.new(*args)
+  end
+  
+  def start(x, y, d)
+    
+  end
+end

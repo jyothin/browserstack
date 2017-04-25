@@ -1,0 +1,31 @@
+class Plateau
+  def initialize(w, h)
+    @w = w
+    @h = h
+    @rovers = Array.new()
+  end
+  
+  def start(x, y, d)
+    @current_rover = Rover.new(x, y, d)  
+  end
+  
+  def move(step)
+    #TODO: step logic here
+  end
+  
+  def get_rover_position
+    @rover.x, @rover.y, @rover.d
+  end
+end
+
+class Rover
+  attr_accessor :x
+  attr_accessor :y
+  attr_accessor :d
+  
+  def initialize(x, y, d)
+    @x = x
+    @y = y
+    @d = d
+  end
+end
