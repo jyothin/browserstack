@@ -1,4 +1,4 @@
-assignments/.metadata/*
-dump.rdb
-redis-stable.tag.gz
-redis-stable/*
+./assignments/.metadata/*
+./dump.rdb
+./redis-stable.tag.gz
+./redis-stable/*
