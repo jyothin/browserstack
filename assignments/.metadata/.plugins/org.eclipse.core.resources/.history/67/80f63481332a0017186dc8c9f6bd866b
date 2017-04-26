@@ -1,0 +1,10 @@
+require 'sinatra'
+require 'redis'
+
+redis = Redis.new
+
+get '/' do
+  'Hello World!'
+  redis.set("mykey", "hello world")
+end
+

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<item value="org.eclipse.dltk.core.environment.localEnvironment" key="org.eclipse.dltk.ui.last.external.environment"/>
+	<item value="/Users/Jyothin/onboarding/assignments" key="org.eclipse.dltk.ui.last.external.project"/>
 	<section name="org.eclipse.dltk.internal.ui.scriptview.ScriptExplorerPart">
 		<item value="1" key="layout"/>
 		<item value="true" key="group_libraries"/>
