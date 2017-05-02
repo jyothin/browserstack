@@ -1,6 +1,6 @@
-./assignments/.metadata/*
-./dump.rdb
-./redis-stable.tag.gz
-./redis-stable/*
-./browserstack/code/node_modules/*
-./ruby_koans/rubykoans.zip
+assignments/.metadata/*
+dump.rdb
+redis-stable.tar.gz
+redis-stable/*
+browserstack/code/node_modules/*
+ruby_koans/rubykoans.zip
