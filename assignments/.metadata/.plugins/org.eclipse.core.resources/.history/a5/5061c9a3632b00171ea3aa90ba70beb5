@@ -1,9 +1,0 @@
-module Constants
-  UNBLOCK_TIMEOUT = 15
-  DEAD_TIMEOUT = 30
-  
-  KEY_SIZE = 32
-  
-  KEY_AVAILABLE = "available"
-  
-end
