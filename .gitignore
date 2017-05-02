@@ -2,5 +2,5 @@ assignments/.metadata/*
 dump.rdb
 redis-stable.tar.gz
 redis-stable/*
-browserstack/code/node_modules/*
+node_js/node_modules/*
 ruby_koans/rubykoans.zip
