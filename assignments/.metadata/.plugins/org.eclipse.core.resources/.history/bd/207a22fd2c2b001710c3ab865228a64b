@@ -1,0 +1,16 @@
+### Playing the Game
+Simply run the below command to start the game
+
+`$> ruby game_on.rb`
+
+Follow the prompts on the command line
+
+### Notes
+* Tested on Mac OS X El-Capitan
+* ruby 2.0.0p648 (2015-12-16 revision 53162) [universal.x86_64-darwin15]
+
+### Test
+* Since this is an interactive game, only basic game scenarios have been tested
+
+### Known Issues
+* If in a 2 player game, if both players end up with the same score the second player is declared the winner.

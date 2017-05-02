@@ -1,4 +1,6 @@
 ### Run the app
+`npm install`
+
 `node app.js`
 
 ### To view the log updates

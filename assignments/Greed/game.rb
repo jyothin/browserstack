@@ -53,7 +53,9 @@ class Game
         puts "Total score: #{current_player.total_score}"
   
         # TODO
-        do_all_s_dices_stuff(turn, current_player)      
+        # Do all scoring dices stuff
+        do_all_s_dices_stuff(turn, current_player)
+        # Do all non scoring dices stuff      
         do_ns_dices_stuff(turn, current_player, dices)
           
         if !final_round
@@ -71,16 +73,30 @@ class Game
     player_scores = Array.new()
     @players.values.each { |p| player_scores << p.total_score }
     max_score = player_scores.max
-    winner = 0
-    @players.each { |k, v| winner = k if v.total_score == max_score }
+    winner = Array.new()
+    @players.each { |k, v| winner << k if v.total_score == max_score }
     
-    puts "Winner is player #{winner} with score #{max_score}"  
+    if winner.length > 1
+      puts "Game is a draw!"
+      winner.each { |w| puts "Winner is player #{w} with score #{max_score}" }
+    else
+      puts "We have a winner!"
+      puts "Winner is player #{winner} with score #{max_score}"
+    end
   end
   
   
       
   def do_all_s_dices_stuff(turn, current_player)
+    dice_set = DiceSet.new(NUMBER_OF_DICE)
+    dice_set.roll
+    s_dices = dice_set.dices()
+    score = dice_set.score()
+    current_player.add_score(turn+0.5, score)
     
+    puts "Player #{current_player.number} rolls: #{s_dices}"
+    puts "Score in this round: #{score}"
+    puts "Total score: #{current_player.total_score}"
   end
   
   def do_ns_dices_stuff(turn, current_player, dices)

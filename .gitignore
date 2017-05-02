@@ -2,3 +2,5 @@
 ./dump.rdb
 ./redis-stable.tag.gz
 ./redis-stable/*
+./browserstack/code/node_modules/*
+./ruby_koans/rubykoans.zip

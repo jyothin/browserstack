@@ -1,5 +1,6 @@
 ### Playing the Game
-Simply run the `game_on.rb` file as
+Simply run the below command to start the game
+
 `$> ruby game_on.rb`
 
 Follow the prompts on the command line
@@ -7,3 +8,10 @@ Follow the prompts on the command line
 ### Notes
 * Tested on Mac OS X El-Capitan
 * ruby 2.0.0p648 (2015-12-16 revision 53162) [universal.x86_64-darwin15]
+
+### Test
+* Since this is an interactive game, only basic game scenarios have been tested
+
+### Known Issues
+* If in a 2 player game, if both players end up with the same score the second player is declared the winner. When in actual both players are winners or the game is a draw.
+* The way I have implemented the 'final round' where the one player who has a total_score >= 3000 is not playing in the final round is unfair!

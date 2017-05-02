@@ -1,6 +1,8 @@
 ### Rove the Rovers
-Simply run the `explore.rb` file as
+Explore Mars by running the command
+
 `$> ruby explore.rb data.in`
+
 where `data.in` is the input file in the format specified in the problem statement.
 
 ### Notes

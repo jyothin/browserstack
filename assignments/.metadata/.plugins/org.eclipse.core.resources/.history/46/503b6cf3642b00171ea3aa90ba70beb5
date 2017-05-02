@@ -1,0 +1,51 @@
+module Workers
+  
+  include Constants
+  
+  $redis = Redis.new
+  
+  class UnblockKeyWorker
+    include Sidekiq::Worker
+    
+    def perform(id)
+      if id != nil && $redis.exists(id.to_s)
+        key = JSON.parse($redis.get(id.to_s))
+        if key[Constants::KEY_BLOCKED_AT_TIMESTAMP] != nil
+          if Time.new(key[Constants::KEY_BLOCKED_AT_TIMESTAMP]) + UNBLOCK_TIMEOUT <= Time.now
+            puts "#{id}: UnblockKeyWorker: timeout"
+            key[Constants::KEY_IS_BLOCKED] = false
+            key[Constants::KEY_BLOCKED_AT_TIMESTAMP] = nil
+            $redis.set(id.to_s, key.to_json)
+            available = JSON.parse($redis.get("available"))
+            available.push(id)
+            $redis.set("available", available)
+          else
+            puts "#{id}: UnblockKeyWorker: No timeout"
+          end
+        end
+      else
+        puts "#{id}: UnblockKeyWorker: key does not exist"
+      end
+    end
+  end
+  
+  class DeadKeyWorker
+    include Sidekiq::Worker
+    
+    def perform(id)
+      if id != nil && $redis.exists(id.to_s)
+        key = JSON.parse($redis.get(id.to_s))
+        if Time.new(key["keep_alive_at_timestamp"]) + DEAD_TIMEOUT <= Time.now
+          puts "#{id}: DeadKeyWorker: timeout!"
+          key["is_dead"] = true
+          $redis.set(id.to_s, key.to_json)
+          $redis.del(id.to_s)
+        else
+          puts "#{id}: DeadKeyWorker: No timeout"
+        end
+      else
+        puts "#{id}: DeadKeyWorker: key does not exist"
+      end
+    end
+  end
+end

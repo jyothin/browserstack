@@ -4,3 +4,6 @@ source "https://rubygems.org"
 # gem "rails"
 gem "sinatra"
 gem "redis"
+# gem "delayed_job_redis", :git => 'https://github.com/Viximo/delayed_job_redis.git'
+# gem "resque"
+gem "sidekiq"

@@ -4,10 +4,10 @@ Write a server which can generate random api keys, assign them for usage and
 release them after sometime.
 
 Following endpoints should be available on the server to interact with it.
-See notes just before each endpoint.
+See notes before each endpoint.
 
 Apart from these endpoints, following rules should be enforced:
-See rule at endpoint e3
+See rule at endpoint E3
 
 No endpoint call should result in an iteration of whole set of keys i.e. 
 no endpoint request should be O(n). They should either be O(lg n) or O(1).
@@ -17,23 +17,29 @@ require 'sinatra'
 require 'redis'
 require 'json'
 require 'securerandom'
+require 'sidekiq'
+require_relative 'workers'
+
+KEY_SIZE = 32
 
 $redis = Redis.new
-$redis.set("available", Array.new())
+$redis.set(KEY_AVAILABLE, Array.new())
 
-#  E1. There should be one endpoint to generate keys.
-get '/e1' do
-  id = SecureRandom.hex(4)
+#E1. There should be one endpoint to generate keys.
+post '/' do
+  extend Workers
+  id = SecureRandom.hex(KEY_SIZE)
   key = Hash.new()
-  key["id"] = id
-  key["keep_alive_timestamp"] = Time.now
-  key["is_blocked"] = false
-  key["blocked_timestamp"] = nil
-  key["is_dead"] = false
+  key[KEY_ID] = id
+  key[KEY_KA_AT_TIMESTAMP] = Time.now
+  key[KEY_IS_BLOCKED] = false
+  key[KEY_BLOCKED_AT_TIMESTAMP] = nil
+  key[KEY_IS_DEAD] = false
   $redis.set(id.to_s, key.to_json)
-  available = JSON.parse($redis.get("available"))
+  available = JSON.parse($redis.get(KEY_AVAILABLE))
   available.push(id)
-  $redis.set("available", available)
+  $redis.set(KEY_AVAILABLE, available)
+  Workers::DeadKeyWorker.perform_in(Workers::DEAD_TIMEOUT, id)
   [201]
 end
 
@@ -41,62 +47,64 @@ end
 #    On hitting this endpoint server should serve a random key which is not already being used.
 #    This key should be blocked and should not be served again by E2, till it is in this state
 #    If no eligible key is available then it should serve 404.
-get '/e2' do
-  available = JSON.parse($redis.get("available"))
-  id = available.shift
-  $redis.set("available", available)
-  if id != nil
+get '/' do
+  extend Workers
+  available = JSON.parse($redis.get(KEY_AVAILABLE))
+  while id = available.shift
+    $redis.set(KEY_AVAILABLE, available)
+    next if id == nil || !$redis.exists(id.to_s)
     key = JSON.parse($redis.get(id.to_s))
-    if !key["is_dead"]
-      key["is_blocked"] = true
-      key["blocked_timestamp"] = Time.now
+    if !key[KEY_IS_DEAD]
+      key[KEY_IS_BLOCKED] = true
+      key[KEY_BLOCKED_AT_TIMESTAMP] = Time.now
       $redis.set(id.to_s, key.to_json)
-      [200, id]
+      Workers::UnblockKeyWorker.perform_in(Workers::UNBLOCK_TIMEOUT, id)
+      return [200, id]
     end
-  else
-    [404]
   end
+  return [404]
 end
 
 #E3. There should be an endpoint to unblock a key. 
 #    Unblocked keys can be served via E2 again.
-# R1. All blocked keys should get released automatically within 60 secs if E3 is not called.
-get '/e3/:id' do
-  id = params['id']
+#R1. All blocked keys should get released automatically within 60 secs if E3 is 
+#    not called.
+get '/:id' do
+  id = params["id"]
+  return [404] if id == nil || !$redis.exists(id.to_s)
   key = JSON.parse($redis.get(id.to_s))
-  key["is_blocked"] = false
-  key["blocked_timestamp"] = nil
+  key[KEY_IS_BLOCKED] = false
+  key[KEY_BLOCKED_AT_TIMESTAMP] = nil
   $redis.set(id.to_s, key.to_json)
-  available = JSON.parse($redis.get("available"))
+  available = JSON.parse($redis.get(KEY_AVAILABLE))
   available.push(id)
-  $redis.set("available", available)
-  # TODO: fire delayed_job to release a key after 60 secs
+  $redis.set(KEY_AVAILABLE, available)
   [200]
 end
 
 #E4. There should be an endpoint to delete a key. 
 #    Deleted keys should be purged.
-delete '/e4/:id' do
-  id = params['id']
+delete '/:id' do
+  id = params["id"]
+  return [400] if id == nil || !$redis.exists(id.to_s)
   key = JSON.parse($redis.get(id.to_s))
-  key["is_dead"] = true
+  key[KEY_IS_DEAD] = true
   $redis.set(id.to_s, key.to_json)
   $redis.del(id.to_s)
-  [200]
+  return [200]
 end
 
-#E5. All keys are to be kept alive by clients calling this endpoint every 5 minutes.
-#    If a particular key has not received a keep alive in last five minutes then it should
-#    be deleted and never used again.
-put '/e5/:id' do
-  id = params['id']
-  if $redis.exists(id.to_s)
-    key = JSON.parse($redis.get(id.to_s))
-    key["keep_alive"] = Time.now
-    $redis.set(id.to_s, key.to_json)
-    [200]
-  else
-    [404]
-  end
-  # TODO: fire delayed_job to delete key after 5 mins
+#E5. All keys are to be kept alive by clients calling this endpoint every 5 
+#    minutes.
+#    If a particular key has not received a keep alive in last five minutes then
+#    it should be deleted and never used again.
+put '/:id' do
+  extend Workers
+  id = params["id"]
+  return [404] if id == nil || !$redis.exists(id.to_s)
+  key = JSON.parse($redis.get(id.to_s))
+  key[KEY_KA_AT_TIMESTAMP] = Time.now
+  $redis.set(id.to_s, key.to_json)
+  Workers::DeadKeyWorker.perform_in(Workers::DEAD_TIMEOUT, id)
+  return [200]
 end

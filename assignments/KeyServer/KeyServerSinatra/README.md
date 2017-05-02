@@ -1,15 +1,15 @@
 ### Install
 * Redis (https://redis.io/topics/quickstart)
 * bundle install
-** Will install sinatra
-** Will install redis-rb
+    * will install sinatra
+    * will install redis-rb
+    * will install sidekiq
 
 ### Run
-* Make sure redis server is running
+* Make sure redis server is running on the standard port `<path to redis>/src/redis-server`
+* Make sure sidekiq is running `sidekiq -r keyserver.rb`
 * `ruby keyserver.rb`
-* `http://localhost:4567`
-** '/e1'
-** '/e2'
-** '/e3'
-** '/e4'
-** '/e5'
+
+### Tests
+* Run `$> bash test.sh` to run the bash tests
+* Tests are automated but need a prompt to execute one after the another
