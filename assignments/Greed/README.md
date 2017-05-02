@@ -13,5 +13,4 @@ Follow the prompts on the command line
 * Since this is an interactive game, only basic game scenarios have been tested
 
 ### Known Issues
-* If in a 2 player game, if both players end up with the same score the second player is declared the winner. When in actual both players are winners or the game is a draw.
 * The way I have implemented the 'final round' where the one player who has a total_score >= 3000 is not playing in the final round is unfair!
