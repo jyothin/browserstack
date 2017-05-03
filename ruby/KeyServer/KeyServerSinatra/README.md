@@ -4,7 +4,7 @@
     * Upgrade to rails 5.0
 * Redis (https://redis.io/topics/quickstart)
 * Sidekiq (https://github.com/mperham/sidekiq)
-* bundle install
+* `bundle install`
     * will install sinatra
     * will install redis-rb
     * will install sidekiq

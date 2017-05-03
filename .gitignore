@@ -1,7 +1,9 @@
-assignments/.metadata/*
-dump.rdb
-redis-stable.tar.gz
-redis-stable/*
-node_js/node_modules/*
-ruby_koans/rubykoans.zip
-selinium/node_modules/*
+/dump.rdb
+/redis-stable.tar.gz
+/redis-stable/*
+/node/tail-f/node_modules/*
+/ruby/ruby_koans/rubykoans.zip
+/selinium/node_modules/*
+/sessions
+/videos
+/docs
