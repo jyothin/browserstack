@@ -2,8 +2,9 @@
 /redis-stable.tar.gz
 /redis-stable/*
 /node/tail-f/node_modules/*
-/ruby/ruby_koans/rubykoans.zip
+/ruby/koans/rubykoans.zip
 /selinium/node_modules/*
 /sessions
 /videos
 /docs
+/.metadata/

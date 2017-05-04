@@ -1,17 +1,20 @@
 {
   "manifest_version": 2,
-  
   "name": "Chrome Extension for REST API",
   "description": "Fetches the list of OS and browsers and submits a test.",
   "version": "1.0",
-  
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
   "browser_action": {
-    "default_icon": "icon.png",
+    "default_icon": "images/icon19.png",
     "default_popup": "popup.html",
     "default_title": "Test your URL"
   },
   "permissions": [
-    "activeTab",
-    "https://ajax.googleapis.com/"
+    //"activeTab",
+    "https://www.browserstack.com/"
   ]
 }

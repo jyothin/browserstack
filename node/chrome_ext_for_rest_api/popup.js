@@ -1,114 +1,135 @@
-/**
- * Get the current URL.
- *
- * @param {function(string)} callback - called when the URL of the current tab
- *   is found.
- */
-function getOsBrowserList(callback) {
-  // Query filter to be passed to chrome.tabs.query - see
-  // https://developer.chrome.com/extensions/tabs#method-query
-  var queryInfo = {
-    active: true,
-    currentWindow: true
-  };
+var _options;
+var _data = {};
+var _type;
+var _desktop;
+var _mobile;
 
-  chrome.tabs.query(queryInfo, function(tabs) {
-    // chrome.tabs.query invokes the callback with a list of tabs that match the
-    // query. When the popup is opened, there is certainly a window and at least
-    // one tab, so we can safely assume that |tabs| is a non-empty array.
-    // A window can only have one active tab at a time, so the array consists of
-    // exactly one tab.
-    var tab = tabs[0];
-
-    // A tab is a plain object that provides information about the tab.
-    // See https://developer.chrome.com/extensions/tabs#type-Tab
-    var url = tab.url;
-
-    // tab.url is only available if the "activeTab" permission is declared.
-    // If you want to see the URL of other tabs (e.g. after removing active:true
-    // from |queryInfo|), then the "tabs" permission is required to see their
-    // "url" properties.
-    console.assert(typeof url == 'string', 'tab.url should be a string');
-
-    callback(url);
-  });
-
-  // Most methods of the Chrome extension APIs are asynchronous. This means that
-  // you CANNOT do something like this:
-  //
-  // var url;
-  // chrome.tabs.query(queryInfo, function(tabs) {
-  //   url = tabs[0].url;
-  // });
-  // alert(url); // Shows "undefined", because chrome.tabs.query is async.
-}
-
-/**
- * @param {string} searchTerm - Search term for Google Image search.
- * @param {function(string,number,number)} callback - Called when an image has
- *   been found. The callback gets the URL, width and height of the image.
- * @param {function(string)} errorCallback - Called when the image is not found.
- *   The callback gets a string that describes the failure reason.
- */
-function getImageUrl(searchTerm, callback, errorCallback) {
-  // Google image search - 100 searches per day.
-  // https://developers.google.com/image-search/
-  var searchUrl = 'https://ajax.googleapis.com/ajax/services/search/images' +
-    '?v=1.0&q=' + encodeURIComponent(searchTerm);
-  var x = new XMLHttpRequest();
-  x.open('GET', searchUrl);
-  // The Google image search API responds with JSON, so let Chrome parse it.
-  x.responseType = 'json';
-  x.onload = function() {
-    // Parse and process the response from Google Image Search.
-    var response = x.response;
-    if (!response || !response.responseData || !response.responseData.results ||
-        response.responseData.results.length === 0) {
-      errorCallback('No response from Google Image search!');
-      return;
+function onOsInput(event) {
+  if (!event.target.value) {console.error("Please select a OS");}
+  else {
+    var browsers_devices = _type[event.target.value];
+    var options = "";
+    var browser_device = document.querySelector('select[name="browser-device"]');
+    for (var i in browsers_devices) {
+      if ( !("os" in browsers_devices[i]) ) {
+        options += "<option value=\""+
+          browsers_devices[i].display_name+"\">"+
+          browsers_devices[i].display_name+
+          "</option>"+
+          "<br>";
+      }
     }
-    var firstResult = response.responseData.results[0];
-    // Take the thumbnail instead of the full image to get an approximately
-    // consistent image size.
-    var imageUrl = firstResult.tbUrl;
-    var width = parseInt(firstResult.tbWidth);
-    var height = parseInt(firstResult.tbHeight);
-    console.assert(
-        typeof imageUrl == 'string' && !isNaN(width) && !isNaN(height),
-        'Unexpected respose from the Google Image Search API!');
-    callback(imageUrl, width, height);
-  };
-  x.onerror = function() {
-    errorCallback('Network error.');
-  };
-  x.send();
+    browser_device.innerHTML = options;
+  }
 }
 
-function renderStatus(statusText) {
-  document.getElementById('status').textContent = statusText;
+function onTypeInput(event) {
+  var type;
+  if (!event.target.value) {console.err("Please select a Type");}
+  else {
+    if (event.target.value === 'Desktop') {
+      type = _desktop;
+      _type = _data.desktop;
+      document.getElementById("browser-device").innerHTML = "Browser:";
+    }
+    else if (event.target.value === 'Mobile') {
+      type = _mobile;
+      _type = _data.mobile;
+      document.getElementById("browser-device").innerHTML = "Device:";
+    }
+    var options = "";
+    var os = document.querySelector('select[name="os"]');
+    for (var i=0; i<type.length; i++) {
+      options += "<option value=\""+
+        type[i].os_display_name+"\">"+
+        type[i].os_display_name+
+        "</option>"+
+        "<br>";
+    }
+    os.innerHTML = options;
+  }
+  onOsInput({target: {value: type[0].os_display_name}});
+}
+
+function getOsBrowserList() {
+  document.getElementById("loading").style.visibility = "visible";
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState === 4 && this.status === 200) {
+      var params = JSON.parse(this.responseText);
+      _data.desktop = {};
+      params.desktop.forEach(function (currentOs, index) {
+        _data.desktop[currentOs.os_display_name] = {"os": currentOs};
+        params.desktop[index].browsers.forEach(function (currentBrowser, browserIndex) {
+          _data.desktop[currentOs.os_display_name][currentBrowser.display_name] = currentBrowser;
+        });
+      });
+      _data.mobile = {};
+      params.mobile.forEach(function (currentOs, index) {
+        _data.mobile[currentOs.os_display_name] = {"os": currentOs};
+        params.mobile[index].devices.forEach(function (currentDevice, deviceIndex) {
+          _data.mobile[currentOs.os_display_name][currentDevice.display_name] = currentDevice;
+        });
+      });
+      _desktop = params.desktop;
+      _mobile = params.mobile;
+      onTypeInput({target: {value: "Desktop"}});
+      onOsInput({target: {value: _desktop[0].os_display_name}});
+      document.getElementById("loading").style.visibility = "hidden";
+    }
+  };
+  xhttp.open(
+      "GET",
+      "https://www.browserstack.com/list-of-browsers-and-platforms.json?product=live",
+      true
+  );
+  xhttp.setRequestHeader("Accept", "application/json");
+  xhttp.onerror = function () {
+    console.error("Network error");
+  };
+  xhttp.send();
+}
+
+function onSubmit(event) {
+  var form = event.target;
+  var type = form.type.value;
+  var os = form.os.value;
+  var browser_device = form["browser-device"].value;
+  var providedUrl = form.url.value;
+  
+  if (!type) {alert("Invalid Type!"); return false;}
+  else if (!os) {alert("Invalid OS!"); return false;}
+  else if (!browser_device) {
+    if (type === "Desktop") {alert("Invalid Browser!");}
+    else {alert("Invalid Device!");}
+    return false;
+  } else if (!providedUrl) {alert("Please provide a URL!"); return false;}
+  
+  console.log(_type);
+  var integrationUrl = "https://www.browserstack.com/start#"+
+    "os="+_type[os]["os"].os+"&"+
+    "os_version="+_type[os]["os"].os_version+"&";
+  if (type === "Desktop") {
+    integrationUrl += "browser="+_type[os][browser_device].browser+"&"+
+      "browser_version="+_type[os][browser_device].browser_version;
+  } else {
+    integrationUrl += "device="+_type[os][browser_device].device+"&";
+  }
+  integrationUrl += "url="+providedUrl;
+  integrationUrl = encodeURI(integrationUrl);
+  console.log(integrationUrl);
+  chrome.tabs.create({url: integrationUrl});
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  getCurrentTabUrl(function(url) {
-    // Put the image URL in Google search.
-    renderStatus('Performing Google Image search for ' + url);
+  document.querySelector('select[name="type"]').onchange = onTypeInput;
+  document.querySelector('select[name="os"]').onchange = onOsInput;
+  //document.querySelector('input[name="submit"]').onclick = onSubmit;
+  document.querySelector('form[name="view_site"]').onsubmit = onSubmit;
 
+  getOsBrowserList(function(url) {
     getImageUrl(url, function(imageUrl, width, height) {
-
-      renderStatus('Search term: ' + url + '\n' +
-          'Google image search result: ' + imageUrl);
-      var imageResult = document.getElementById('image-result');
-      // Explicitly set the width/height to minimize the number of reflows. For
-      // a single image, this does not matter, but if you're going to embed
-      // multiple external images in your page, then the absence of width/height
-      // attributes causes the popup to resize multiple times.
-      imageResult.width = width;
-      imageResult.height = height;
-      imageResult.src = imageUrl;
-      imageResult.hidden = false;
-
     }, function(errorMessage) {
-      renderStatus('Cannot display image. ' + errorMessage);
     });
   });
 });

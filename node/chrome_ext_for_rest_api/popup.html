@@ -12,19 +12,68 @@
         font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
         font-size: 100%;
       }
-      #status {
-        /* avoid an excessively wide status text */
-        white-space: pre;
+      form#view-site {
         text-overflow: ellipsis;
         overflow: hidden;
-        max-width: 400px;
+      }
+      table#view-site {
+        width: 620px;
+      }
+      #submit {
+        background-color: #3090C7;
+        color: white;
+        width: 100%;
+      }
+      #loading {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.1) url(images/hourglass.svg) center center no-repeat;
+        background-size: 10%;
+        opacity: 1.0;
       }
     </style>
     <script src="popup.js"></script>
   </head>
   <body>
-    <div id="status"></div>
-    <img id="image-result" hidden>
+    <div id="options">
+      <div id="loading"></div>
+    <!-- "https://www.browserstack.com/start#" -->
+      <form id="view_site" name="view_site" >
+        <table id="view_site">
+          <tr>
+            <td>Type:</td>
+            <td>
+              <select name="type" required style="width: 80px;">
+                <option value="Desktop">Desktop</option>
+                <option value="Mobile">Mobile</option>
+              </select>
+            </td>
+            <td>OS:</td>
+            <td>
+              <select name="os" required style="width: 150px;">
+              </select>
+            </td>
+            <td style="width: 90px;"><span id="browser-device" style="width: 90px;">Browser:</span></td>
+            <td>
+              <select name="browser-device" required style="width: 200px;">
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>URL:</td>
+            <td colspan=5>
+              <input name="url" type="text" style="width: 99%">
+            </td>
+          </tr>
+          <tr>
+            <td colspan=6>
+              <input id="submit" type="submit" value="View Site"/>
+            </td>
+          </tr>
+        </table>
+      </form>
+    </div>
   </body>
 </html>
 
