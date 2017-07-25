@@ -21,7 +21,7 @@ class DiceSet
 
   def score
     @dices.each { |n| 
-      @hash[n] += 1;
+      @hash[n] += 1
     }
     @hash.keys.each { |key| @stack.push(key) }
     score = 0 
@@ -48,4 +48,13 @@ class DiceSet
     return score
   end
   
+  def get_ns_dices
+    ns_dices = Array.new()
+    @dices.each { |x| ns_dices << x if ((x != 1) && (x != 5)) }
+    hash = Hash.new(0)
+    ns_dices.each { |n|
+      hash[n] += 1
+    }
+    ns_dices.each { |dice| ns_dices.delete(dice) if hash[dice] >= 3 }
+  end
 end

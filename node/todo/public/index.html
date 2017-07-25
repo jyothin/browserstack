@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html ng-app="todo">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Todo App</title>
+  <link 
+    rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
+    crossorigin="anonymous"
+  >
+  <style>
+    html {overflow-y: scroll;}
+    body {padding-top: 50px;}
+    #todo-list {margin-bottom: 30px;}
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  <script src="core.js"></script>
+  <script type="text/javascript">
+    
+  </script>
+</head>
+<body ng-controller="mainController">
+  <div class="container">
+    <div class="text-center">
+      <h1>BrowserStack Onboarding Todo App with <span class="label label-info">{{ todos.length }}</span> todos.</h1>
+    </div>
+    <div id="todo-list" class="row">
+      <div class="col-sm-4 col-sm-offset-4">
+        <div id="todo_items" class="checkbox" ng-repeat="todo in todos">
+          <label>
+            <input type="checkbox" ng-click="deleteTodo(todo._id)">{{todo.text}}</input>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div id="todo-form" class="row">
+      <div class="col-sm-8 col-sm-offset-2 text-center">
+        <form>
+          <div class="form-group">
+            <input type="text" class="form-control input-lg text-center" ng-model="formData.text">
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" ng-click="createTodo()">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

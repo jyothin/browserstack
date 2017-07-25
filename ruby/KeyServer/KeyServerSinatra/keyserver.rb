@@ -13,6 +13,10 @@ No endpoint call should result in an iteration of whole set of keys i.e.
 no endpoint request should be O(n). They should either be O(lg n) or O(1).
 '''
 
+# Redis is single threaded hence it will queue up operations
+# Use List type in Redis for storing the list of available Keys
+# Use Map type in Redis for storing the keys
+
 require 'sinatra'
 require 'redis'
 require 'json'

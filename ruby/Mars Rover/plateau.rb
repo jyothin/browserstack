@@ -1,5 +1,7 @@
 class Plateau
   def initialize(w, h)
+    # Check for boundary conditions
+    # raise an exception if boundary conditions are not met
     @w = w
     @h = h
     @rover = nil
@@ -80,17 +82,5 @@ class Plateau
     when "W"
       return x-1, y, d
     end
-  end
-end
-
-class Rover
-  attr_accessor :x
-  attr_accessor :y
-  attr_accessor :d
-  
-  def initialize(x, y, d)
-    @x = x
-    @y = y
-    @d = d
   end
 end

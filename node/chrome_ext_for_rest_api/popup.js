@@ -105,20 +105,19 @@ function onSubmit(event) {
     return false;
   } else if (!providedUrl) {alert("Please provide a URL!"); return false;}
   
-  console.log(_type);
   var integrationUrl = "https://www.browserstack.com/start#"+
     "os="+_type[os]["os"].os+"&"+
     "os_version="+_type[os]["os"].os_version+"&";
   if (type === "Desktop") {
     integrationUrl += "browser="+_type[os][browser_device].browser+"&"+
-      "browser_version="+_type[os][browser_device].browser_version;
+      "browser_version="+_type[os][browser_device].browser_version+"&";
   } else {
     integrationUrl += "device="+_type[os][browser_device].device+"&";
   }
-  integrationUrl += "url="+providedUrl;
-  integrationUrl = encodeURI(integrationUrl);
-  console.log(integrationUrl);
-  chrome.tabs.create({url: integrationUrl});
+  integrationUrl += "url="+encodeURIComponent(providedUrl);
+  var encodedUrl = encodeURI(integrationUrl);
+  console.log(encodedUrl);
+  chrome.tabs.create({url: encodedUrl});
 }
 
 document.addEventListener('DOMContentLoaded', function() {

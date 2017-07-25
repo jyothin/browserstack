@@ -7,8 +7,8 @@ KEY_IS_DEAD = "is_dead"
 
 module Workers
   
-  UNBLOCK_TIMEOUT = 15
-  DEAD_TIMEOUT = 30
+  UNBLOCK_TIMEOUT = 60
+  DEAD_TIMEOUT = 300
   
   $redis = Redis.new
   
